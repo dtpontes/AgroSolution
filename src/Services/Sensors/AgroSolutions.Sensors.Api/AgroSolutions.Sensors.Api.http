@@ -1,6 +1,32 @@
-@AgroSolutions.Sensors.Api_HostAddress = http://localhost:5121
+### AgroSolutions Sensors API - Testes HTTP
+@baseUrl = http://localhost:5003
+@token = seu-token-aqui
+@talhaoId = 00000000-0000-0000-0000-000000000000
 
-GET {{AgroSolutions.Sensors.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Health Check
+GET {{baseUrl}}/health
 
-###
+### Ingestao de dados do sensor
+POST {{baseUrl}}/api/sensors/ingest
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "talhaoId": "{{talhaoId}}",
+  "umidadeSolo": 45.3,
+  "temperatura": 28.7,
+  "precipitacao": 12.5
+}
+
+### Buscar dados por talhao
+GET {{baseUrl}}/api/sensors/talhao/{{talhaoId}}
+Authorization: Bearer {{token}}
+
+### Buscar dados com intervalo
+GET {{baseUrl}}/api/sensors/talhao/{{talhaoId}}?start=2025-01-01T00:00:00Z&end=2025-12-31T23:59:59Z
+Authorization: Bearer {{token}}
+
+````````
+
+
+# Response

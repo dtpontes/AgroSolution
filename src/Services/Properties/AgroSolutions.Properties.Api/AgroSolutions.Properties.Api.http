@@ -1,6 +1,42 @@
-@AgroSolutions.Properties.Api_HostAddress = http://localhost:5292
+### AgroSolutions Properties API - Testes HTTP
+@baseUrl = http://localhost:5002
+@token = seu-token-aqui
+@propriedadeId = 00000000-0000-0000-0000-000000000000
 
-GET {{AgroSolutions.Properties.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Health Check
+GET {{baseUrl}}/health
 
-###
+### Listar propriedades do produtor autenticado
+GET {{baseUrl}}/api/propriedades
+Authorization: Bearer {{token}}
+
+### Criar nova propriedade
+POST {{baseUrl}}/api/propriedades
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Fazenda Sao Pedro",
+  "localizacao": "Sao Jose do Rio Preto - SP",
+  "areaTotal": 1200.50
+}
+
+### Criar talhao para uma propriedade
+POST {{baseUrl}}/api/propriedades/{{propriedadeId}}/talhoes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nome": "Talhao A",
+  "area": 300.75,
+  "cultura": "Soja"
+}
+
+### Listar talhoes de uma propriedade
+GET {{baseUrl}}/api/propriedades/{{propriedadeId}}/talhoes
+Authorization: Bearer {{token}}
+
+````````
+
+
+# Response
