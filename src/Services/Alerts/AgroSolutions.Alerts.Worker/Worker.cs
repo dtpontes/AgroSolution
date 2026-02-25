@@ -1,24 +1,36 @@
-namespace AgroSolutions.Alerts.Worker
+using AgroSolutions.Alerts.Worker.Services;
+
+namespace AgroSolutions.Alerts.Worker;
+
+public class Worker : BackgroundService
 {
-    public class Worker : BackgroundService
+    private readonly ILogger<Worker> _logger;
+    private readonly IServiceProvider _serviceProvider;
+
+    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider)
     {
-        private readonly ILogger<Worker> _logger;
+        _logger = logger;
+        _serviceProvider = serviceProvider;
+    }
 
-        public Worker(ILogger<Worker> logger)
-        {
-            _logger = logger;
-        }
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Alerts Worker iniciado em {time}", DateTimeOffset.Now);
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        while (!stoppingToken.IsCancellationRequested)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                if (_logger.IsEnabled(LogLevel.Information))
-                {
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                }
-                await Task.Delay(1000, stoppingToken);
+                using var scope = _serviceProvider.CreateScope();
+                var processingService = scope.ServiceProvider.GetRequiredService<IAlertProcessingService>();
+                await processingService.ProcessAsync(stoppingToken);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao processar alertas");
+            }
+
+            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
         }
     }
 }
