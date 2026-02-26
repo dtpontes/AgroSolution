@@ -21,7 +21,4 @@ USER appuser
 
 COPY --from=publish /app/publish .
 
-EXPOSE 8080
-ENV ASPNETCORE_HTTP_PORTS=8080
-
 ENTRYPOINT ["dotnet", "AgroSolutions.Sensors.Api.dll"]

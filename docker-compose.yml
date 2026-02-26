@@ -1,0 +1,171 @@
+services:
+  # PostgreSQL para Identity
+  identity-db:
+    image: postgres:15-alpine
+    container_name: agro-identity-db
+    environment:
+      POSTGRES_USER: identity_user
+      POSTGRES_PASSWORD: identity_pass_123
+      POSTGRES_DB: identity_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - identity-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U identity_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL para Properties
+  properties-db:
+    image: postgres:15-alpine
+    container_name: agro-properties-db
+    environment:
+      POSTGRES_USER: properties_user
+      POSTGRES_PASSWORD: properties_pass_123
+      POSTGRES_DB: properties_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - properties-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U properties_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL para Sensors
+  sensors-db:
+    image: postgres:15-alpine
+    container_name: agro-sensors-db
+    environment:
+      POSTGRES_USER: sensors_user
+      POSTGRES_PASSWORD: sensors_pass_123
+      POSTGRES_DB: sensors_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - sensors-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sensors_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL para Alerts
+  alerts-db:
+    image: postgres:15-alpine
+    container_name: agro-alerts-db
+    environment:
+      POSTGRES_USER: alerts_user
+      POSTGRES_PASSWORD: alerts_pass_123
+      POSTGRES_DB: alerts_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - alerts-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alerts_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ para mensageria
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: agro-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API de Identidade
+  identity-api:
+    build:
+      context: .
+      dockerfile: src/Services/Identity/AgroSolutions.Identity.Api/Dockerfile
+    container_name: agro-identity-api
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8081
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Server=identity-db;Port=5432;Database=identity_db;User Id=identity_user;Password=identity_pass_123;
+    ports:
+      - "8081:8081"
+    depends_on:
+      identity-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # API de Properties
+  properties-api:
+    build:
+      context: .
+      dockerfile: src/Services/Properties/AgroSolutions.Properties.Api/Dockerfile
+    container_name: agro-properties-api
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8082
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Server=properties-db;Port=5432;Database=properties_db;User Id=properties_user;Password=properties_pass_123;
+    ports:
+      - "8082:8082"
+    depends_on:
+      properties-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # API de Sensors
+  sensors-api:
+    build:
+      context: .
+      dockerfile: src/Services/Sensors/AgroSolutions.Sensors.Api/Dockerfile
+    container_name: agro-sensors-api
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8083
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Server=sensors-db;Port=5432;Database=sensors_db;User Id=sensors_user;Password=sensors_pass_123;
+      RabbitMQ__Host: rabbitmq
+    ports:
+      - "8083:8083"
+    depends_on:
+      sensors-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # API de Alerts
+  alerts-api:
+    build:
+      context: .
+      dockerfile: src/Services/Alerts/AgroSolutions.Alerts.API/Dockerfile
+    container_name: agro-alerts-api
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8084
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__AlertsConnection: Server=alerts-db;Port=5432;Database=alerts_db;User Id=alerts_user;Password=alerts_pass_123;
+      RabbitMQ__Host: rabbitmq
+    ports:
+      - "8084:8084"
+    depends_on:
+      alerts-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  identity-db-data:
+  properties-db-data:
+  sensors-db-data:
+  alerts-db-data:
+  rabbitmq-data:
