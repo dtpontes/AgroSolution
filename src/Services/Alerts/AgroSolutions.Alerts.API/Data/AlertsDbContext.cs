@@ -1,7 +1,7 @@
 using AgroSolutions.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AgroSolutions.Alerts.Worker.Data;
+namespace AgroSolutions.Alerts.API.Data;
 
 public class AlertsDbContext : DbContext
 {

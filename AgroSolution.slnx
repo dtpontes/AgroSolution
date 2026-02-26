@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="src/Services/Alerts/AgroSolutions.Alerts.Worker/AgroSolutions.Alerts.Worker.csproj" Id="b9b1c615-de58-4e22-855e-beb63f0daeec" />
+  <Project Path="src/Services/Alerts/AgroSolutions.Alerts.API/AgroSolutions.Alerts.API.csproj" Id="a3b19e5d-a2a8-49ff-a99b-52956507f560" />
   <Project Path="src/Services/Identity/AgroSolutions.Identity.Api/AgroSolutions.Identity.Api.csproj" Id="e42c9526-6b2a-46cb-a076-a8621cdf0d02" />
   <Project Path="src/Services/Properties/AgroSolutions.Properties.Api/AgroSolutions.Properties.Api.csproj" Id="15882883-5096-47da-b860-0ed109af8fed" />
   <Project Path="src/Services/Sensors/AgroSolutions.Sensors.Api/AgroSolutions.Sensors.Api.csproj" Id="fda4c5f0-6350-4bed-bbfc-c095fe911214" />

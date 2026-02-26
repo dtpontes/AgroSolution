@@ -1,8 +1,8 @@
-using AgroSolutions.Alerts.Worker.Data;
+using AgroSolutions.Alerts.API.Data;
 using AgroSolutions.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AgroSolutions.Alerts.Worker.Services;
+namespace AgroSolutions.Alerts.API.Services;
 
 public interface IAlertProcessingService
 {

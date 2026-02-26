@@ -1,5 +1,6 @@
 using AgroSolutions.Sensors.Api.Data;
 using AgroSolutions.Sensors.Api.Services;
+using AgroSolutions.Shared.Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +14,13 @@ builder.Services.AddDbContext<SensorsDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseNpgsql(connectionString);
+});
+
+// ===== RABBITMQ =====
+builder.Services.AddSingleton<IMessageBus>(sp =>
+{
+    var host = builder.Configuration["RabbitMQ:Host"] ?? "localhost";
+    return new RabbitMQMessageBus(host);
 });
 
 // ===== SERVICES =====

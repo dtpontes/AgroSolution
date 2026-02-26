@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace AgroSolutions.Alerts.Worker.Migrations
+namespace AgroSolutions.Alerts.API.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

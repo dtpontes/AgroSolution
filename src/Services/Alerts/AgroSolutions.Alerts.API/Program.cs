@@ -1,6 +1,6 @@
-using AgroSolutions.Alerts.Worker;
-using AgroSolutions.Alerts.Worker.Data;
-using AgroSolutions.Alerts.Worker.Services;
+using AgroSolutions.Alerts.API.Data;
+using AgroSolutions.Alerts.API.Services;
+using AgroSolutions.Alerts.API.BackgroundServices;
 using AgroSolutions.Shared.Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +29,7 @@ builder.Services.AddScoped<IAlertProcessingService, AlertProcessingService>();
 builder.Services.AddScoped<IAlertStatusService, AlertStatusService>();
 
 // ===== BACKGROUND WORKERS =====
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<AlertWorker>();
 builder.Services.AddHostedService<SensorDataConsumerService>();
 
 // ===== CORS =====

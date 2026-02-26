@@ -1,6 +1,7 @@
 using AgroSolutions.Sensors.Api.Data;
 using AgroSolutions.Sensors.Api.DTOs;
 using AgroSolutions.Shared.Models;
+using AgroSolutions.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 namespace AgroSolutions.Sensors.Api.Services;
@@ -14,11 +15,13 @@ public interface ISensorDataService
 public class SensorDataService : ISensorDataService
 {
     private readonly SensorsDbContext _context;
+    private readonly IMessageBus _messageBus;
     private readonly ILogger<SensorDataService> _logger;
 
-    public SensorDataService(SensorsDbContext context, ILogger<SensorDataService> logger)
+    public SensorDataService(SensorsDbContext context, IMessageBus messageBus, ILogger<SensorDataService> logger)
     {
         _context = context;
+        _messageBus = messageBus;
         _logger = logger;
     }
 
@@ -38,6 +41,17 @@ public class SensorDataService : ISensorDataService
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Dados de sensor registrados: {SensorDataId} - Talhao {TalhaoId}", sensorData.Id, sensorData.TalhaoId);
+
+        // Publicar no RabbitMQ
+        try
+        {
+            await _messageBus.PublishAsync("sensor-data-queue", sensorData);
+            _logger.LogInformation("Evento publicado no RabbitMQ: {SensorDataId}", sensorData.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao publicar evento no RabbitMQ");
+        }
 
         return Map(sensorData);
     }
