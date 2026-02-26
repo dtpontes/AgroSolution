@@ -38,11 +38,11 @@ A AgroSolutions implementa conceitos de **Agricultura 4.0** através de:
 │ identity_db   │   │ properties_db │   │ sensors_db    │   │ alerts_db     │
 │ PostgreSQL    │   │ PostgreSQL    │   │ PostgreSQL    │   │ PostgreSQL    │
 └───────────────┘   └───────────────┘   └───────────────┘   └───────────────┘
-      │                   │                   │                   │
-      ▼                   ▼                   ▼                   ▼
-┌───────────────────────────────────────────────────────────────────────────┐
-│ RabbitMQ (mensageria)                                                    │
-└───────────────────────────────────────────────────────────────────────────┘
+                                              │                   │
+                                              ▼                   ▼
+                        ┌───────────────────────────────────────────────────┐
+                        │                  RabbitMQ (mensageria)            │
+                        └───────────────────────────────────────────────────┘
 ```
 
 ### Tecnologias
