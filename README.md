@@ -9,53 +9,40 @@ Plataforma de IoT e análise de dados para agricultura de precisão desenvolvida
 
 ## 📋 Sobre o Projeto
 
-A AgroSolutions é uma plataforma que implementa conceitos de **Agricultura 4.0** através de:
-- 🌡️ **Monitoramento em tempo real** de sensores de campo
-- 📊 **Análise de dados** de umidade, temperatura e precipitação
-- ⚠️ **Sistema de alertas** automáticos
-- 📱 **Dashboard** para visualização de dados históricos
+A AgroSolutions implementa conceitos de **Agricultura 4.0** através de:
+- 🌡️ Monitoramento em tempo real de sensores de campo
+- 📊 Análise de dados de umidade, temperatura e precipitação
+- ⚠️ Sistema de alertas automáticos
+- 📱 Dashboard para visualização de dados históricos
 
-### Requisitos Funcionais Implementados
+### Funcionalidades
 
-✅ Autenticação de Usuário (Produtor Rural)  
-✅ Cadastro de Propriedade e Talhões  
-✅ Ingestão de Dados de Sensores (via API)  
-✅ Dashboard de Monitoramento  
-✅ Motor de Alertas Simples  
+- Autenticação de Usuário (Produtor Rural)
+- Cadastro de Propriedade e Talhões
+- Ingestão de Dados de Sensores (via API)
+- Dashboard de Monitoramento
+- Motor de Alertas
 
 ## 🏗️ Arquitetura
 
 ### Microserviços
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Identity API   │     │ Properties API  │     │  Sensors API    │
-│     :5001       │     │     :5002       │     │     :5003       │
-└────────┬────────┘     └────────┬────────┘     └────────┬────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  identity_db    │     │ properties_db   │     │  sensors_db     │
-│   PostgreSQL    │     │   PostgreSQL    │     │   PostgreSQL    │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                                                          │
-                                                          ▼
-                                                 ┌─────────────────┐
-                                                 │    RabbitMQ     │
-                                                 │     :5672       │
-                                                 └────────┬────────┘
-                                                          │
-                                                          ▼
-                                                 ┌─────────────────┐
-                                                 │ Alerts Worker   │
-                                                 │ (Background)    │
-                                                 └────────┬────────┘
-                                                          │
-                                                          ▼
-                                                 ┌─────────────────┐
-                                                 │   alerts_db     │
-                                                 │   PostgreSQL    │
-                                                 └─────────────────┘
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│ Identity API  │   │ Properties API│   │ Sensors API   │   │ Alerts API    │
+│   :8081       │   │   :8082       │   │   :8083       │   │   :8084       │
+└─────┬─────────┘   └─────┬─────────┘   └─────┬─────────┘   └─────┬─────────┘
+      │                   │                   │                   │
+      ▼                   ▼                   ▼                   ▼
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│ identity_db   │   │ properties_db │   │ sensors_db    │   │ alerts_db     │
+│ PostgreSQL    │   │ PostgreSQL    │   │ PostgreSQL    │   │ PostgreSQL    │
+└───────────────┘   └───────────────┘   └───────────────┘   └───────────────┘
+      │                   │                   │                   │
+      ▼                   ▼                   ▼                   ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│ RabbitMQ (mensageria)                                                    │
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Tecnologias
@@ -67,34 +54,56 @@ A AgroSolutions é uma plataforma que implementa conceitos de **Agricultura 4.0*
 - **ORM:** Entity Framework Core 9
 - **Documentação:** Swagger/OpenAPI
 - **Containerização:** Docker
-- **Orquestração:** Kubernetes (preparado)
+- **Orquestração:** Docker Compose
+- **Observabilidade:** Prometheus + Grafana
 
-## 🚀 Quick Start
+## 🚀 Como rodar toda a solução
 
-### Pré-requisitos
+1. **Pré-requisitos:**
+   - Docker e Docker Compose instalados
+   - .NET 9 SDK (apenas se for rodar/testar fora do Docker)
 
-- ✅ .NET 9 SDK
-- ✅ Docker Desktop
-- ✅ Visual Studio 2026 (ou VS Code)
-- ✅ PowerShell 7+
+2. **Subir toda a stack:**
+   ```bash
+   docker-compose up -d --build
+   ```
+   Isso irá:
+   - Buildar as imagens das APIs
+   - Subir bancos, RabbitMQ, Prometheus e Grafana
 
-### Setup Rápido - Identity API
+3. **Parar tudo:**
+   ```bash
+   docker-compose down
+   ```
 
-```powershell
-# 1. Clone o repositório
-git clone <seu-repo>
-cd AgroSolution
+## 🌐 URLs dos Serviços
 
-# 2. Execute o setup automático
-.\scripts\setup-identity-service.ps1
+| Serviço         | URL/localhost         | Observações                  |
+|----------------|----------------------|------------------------------|
+| Identity API   | http://localhost:8081 | Swagger na raiz              |
+| Properties API | http://localhost:8082 | Swagger na raiz              |
+| Sensors API    | http://localhost:8083 | Swagger na raiz              |
+| Alerts API     | http://localhost:8084 | Swagger na raiz              |
+| RabbitMQ       | http://localhost:15672| guest/guest                  |
+| Prometheus     | http://localhost:9091 | Dashboards de métricas       |
+| Grafana        | http://localhost:3000 | admin/admin (primeiro acesso)|
 
-# 3. Inicie a API
-cd src/Services/Identity/AgroSolutions.Identity.Api
-dotnet run
+- **Swagger:** basta acessar a raiz de cada API (ex: http://localhost:8081/)
+- **Métricas Prometheus:** cada API expõe `/metrics` na porta 9090 (usado pelo Prometheus)
 
-# 4. Acesse o Swagger
-# http://localhost:5001
-```
+## 📊 Observabilidade
+
+- **Prometheus** coleta métricas de todas as APIs automaticamente (veja `prometheus.yml`)
+- **Grafana** já está configurado para conectar no Prometheus (importar dashboards .NET é opcional)
+- Para criar dashboards .NET, use templates da comunidade ou importe pelo ID no Grafana
+
+## 🐳 CI/CD com GitHub Actions + Docker Hub
+
+- Push na branch `master` dispara build e push das imagens Docker para o Docker Hub
+- Secrets necessários: `DOCKER_USERNAME` e `DOCKER_PASSWORD` (token do Docker Hub)
+- Workflows principais:
+  - `.github/workflows/docker-build-push.yml` (recomendado)
+  - `.github/workflows/docker-build-push-advanced.yml` (opcional, com scan de segurança)
 
 ## 📦 Estrutura do Projeto
 
@@ -102,67 +111,35 @@ dotnet run
 AgroSolution/
 ├── src/
 │   ├── Services/
-│   │   ├── Identity/                  # ✅ Implementado
-│   │   │   └── AgroSolutions.Identity.Api/
-│   │   ├── Properties/                # 🚧 Em desenvolvimento
-│   │   │   └── AgroSolutions.Properties.Api/
-│   │   ├── Sensors/                   # 🚧 Em desenvolvimento
-│   │   │   └── AgroSolutions.Sensors.Api/
-│   │   └── Alerts/                    # 🚧 Em desenvolvimento
-│   │       └── AgroSolutions.Alerts.Worker/
-│   └── Shared/
-│       └── AgroSolutions.Shared/      # ✅ Implementado
-├── scripts/                           # Scripts PowerShell
-├── k8s/                              # Manifests Kubernetes
-├── docker-compose.yml                # 🚧 Em desenvolvimento
+│   │   ├── Identity/AgroSolutions.Identity.Api
+│   │   ├── Properties/AgroSolutions.Properties.Api
+│   │   ├── Sensors/AgroSolutions.Sensors.Api
+│   │   └── Alerts/AgroSolutions.Alerts.API
+│   └── Shared/AgroSolutions.Shared
+├── scripts/                           # Scripts PowerShell/Bash
+├── docker-compose.yml                 # Orquestração completa
+├── prometheus.yml                     # Configuração Prometheus
 └── README.md
 ```
 
-## 🔑 Serviços Implementados
+## 🔑 Serviços
 
-### 1. Identity API ✅
-
-**Porta:** 5001  
-**Database:** identity_db (porta 5433)
-
-Responsável por:
+### 1. Identity API
 - Registro de produtores rurais
 - Autenticação via JWT
 - Gerenciamento de sessões
 
-**Endpoints:**
-- `POST /api/auth/register` - Registrar novo usuário
-- `POST /api/auth/login` - Login
-- `GET /api/auth/me` - Dados do usuário (autenticado)
-- `GET /health` - Health check
-
-📖 [Documentação completa](src/Services/Identity/AgroSolutions.Identity.Api/README.md)
-
-### 2. Properties API 🚧
-
-**Porta:** 5002  
-**Database:** properties_db (porta 5434)
-
-Responsável por:
+### 2. Properties API
 - Cadastro de propriedades rurais
 - Gerenciamento de talhões
 - Associação de culturas
 
-### 3. Sensors API 🚧
-
-**Porta:** 5003  
-**Database:** sensors_db (porta 5435)
-
-Responsável por:
+### 3. Sensors API
 - Recepção de dados de sensores
 - Armazenamento de séries temporais
 - Publicação em RabbitMQ
 
-### 4. Alerts Worker 🚧
-
-**Database:** alerts_db (porta 5436)
-
-Responsável por:
+### 4. Alerts API
 - Processamento assíncrono de dados
 - Geração de alertas automáticos
 - Regras de negócio:
@@ -174,129 +151,53 @@ Responsável por:
 
 Cada serviço possui seu próprio banco de dados (Database per Service pattern):
 
-| Serviço | Database | Porta | User | Password |
-|---------|----------|-------|------|----------|
-| Identity | identity_db | 5433 | identity_user | identity_pass_123 |
-| Properties | properties_db | 5434 | properties_user | properties_pass_123 |
-| Sensors | sensors_db | 5435 | sensors_user | sensors_pass_123 |
-| Alerts | alerts_db | 5436 | alerts_user | alerts_pass_123 |
+| Serviço    | Database       | Porta | User            | Password            |
+|------------|---------------|-------|-----------------|---------------------|
+| Identity   | identity_db   | 5433  | identity_user   | identity_pass_123   |
+| Properties | properties_db | 5434  | properties_user | properties_pass_123 |
+| Sensors    | sensors_db    | 5435  | sensors_user    | sensors_pass_123    |
+| Alerts     | alerts_db     | 5436  | alerts_user     | alerts_pass_123     |
 
-## 🧪 Testando a API
-
-### Via HTTP File (Visual Studio)
-
-Use os arquivos `.http` em cada projeto:
-```
-src/Services/Identity/AgroSolutions.Identity.Api/AgroSolutions.Identity.Api.http
-```
-
-### Via cURL
-
-```bash
-# Registrar
-curl -X POST http://localhost:5001/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "João Silva",
-    "email": "joao@email.com",
-    "password": "senha123",
-    "telefone": "(11) 98765-4321"
-  }'
-
-# Login
-curl -X POST http://localhost:5001/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "joao@email.com",
-    "password": "senha123"
-  }'
-```
+## 🧪 Testando as APIs
 
 ### Via Swagger
+Acesse a raiz de cada API (ex: http://localhost:8081)
 
-Acesse: http://localhost:5001
-
-## 🐳 Docker
-
-### Serviços Individuais
-
+### Via cURL
 ```bash
-# Identity API
-docker build -t agrosolutions/identity-api -f src/Services/Identity/AgroSolutions.Identity.Api/Dockerfile .
-docker run -p 5001:8080 agrosolutions/identity-api
+# Registrar usuário
+curl -X POST http://localhost:8081/api/auth/register -H "Content-Type: application/json" -d '{"nome": "João Silva", "email": "joao@email.com", "password": "senha123", "telefone": "(11) 98765-4321"}'
+
+# Login
+curl -X POST http://localhost:8081/api/auth/login -H "Content-Type: application/json" -d '{"email": "joao@email.com", "password": "senha123"}'
 ```
-
-### Docker Compose (Em breve)
-
-```bash
-docker-compose up -d
-```
-
-## 📊 Monitoramento (Planejado)
-
-- **Prometheus** - Coleta de métricas
-- **Grafana** - Visualização de dashboards
-- **Zabbix** - Monitoramento de infraestrutura
-
-## 🔐 Segurança
-
-- ✅ JWT com assinatura HMAC-SHA256
-- ✅ Senhas com hash BCrypt
-- ✅ CORS configurável
-- ✅ HTTPS obrigatório em produção
-- ✅ User Secrets para desenvolvimento
-- ✅ Containers non-root
 
 ## 📝 Scripts Disponíveis
 
 ```powershell
-# Identity Service
-.\scripts\setup-identity-service.ps1          # Setup completo
-.\scripts\start-identity-postgres.ps1         # Apenas PostgreSQL
-.\scripts\create-identity-migration.ps1       # Criar migration
-.\scripts\update-identity-database.ps1        # Aplicar migration
+# Setup completo
+./scripts/setup-identity-service.ps1
+# Criar migration
+./scripts/create-identity-migration.ps1
+# Aplicar migration
+./scripts/update-identity-database.ps1
 ```
 
-## 🎓 Requisitos do Projeto FIAP
+## 🔐 Segurança
 
-### Requisitos Técnicos Obrigatórios
-
-- ✅ Arquitetura baseada em Microsserviços
-- 🚧 Orquestração com Kubernetes
-- 🚧 Observabilidade (Grafana/Zabbix)
-- 🚧 Mensageria (RabbitMQ)
-- 🚧 Pipeline CI/CD (GitHub Actions)
-- ✅ Melhores práticas de arquitetura
-
-### Entregáveis
-
-1. ✅ Desenho da Solução MVP
-2. 🚧 Demonstração da Infraestrutura
-3. 🚧 Demonstração da Esteira de CI/CD
-4. 🚧 Demonstração do MVP Funcional
-
-## 🤝 Contribuindo
-
-Este é um projeto acadêmico. Contribuições são bem-vindas!
-
-1. Fork o projeto
-2. Crie uma feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+- JWT com assinatura HMAC-SHA256
+- Senhas com hash BCrypt
+- CORS configurável
+- HTTPS obrigatório em produção
+- Containers non-root
 
 ## 📧 Contato
 
 Projeto desenvolvido para o curso **8NETT** da FIAP
 
-- 👥 Equipe AgroSolutions
-- 📧 Email: contato@agrosolutions.com
+- Equipe AgroSolutions
+- Email: dtpontes@hotmail.com
 
 ## 📄 Licença
 
 Este projeto é proprietário - AgroSolutions © 2024
-
----
-
-⭐ **Status do Projeto:** Em Desenvolvimento Ativo  
-🎯 **Próximo Milestone:** Properties API + Sensors API + RabbitMQ Integration
