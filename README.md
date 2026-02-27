@@ -85,7 +85,7 @@ A AgroSolutions implementa conceitos de **Agricultura 4.0** através de:
 | Sensors API    | http://localhost:8083 | Swagger na raiz              |
 | Alerts API     | http://localhost:8084 | Swagger na raiz              |
 | RabbitMQ       | http://localhost:15672| guest/guest                  |
-| Prometheus     | http://localhost:9091 | Dashboards de métricas       |
+| Prometheus     | http://localhost:9099 | Dashboards de métricas       |
 | Grafana        | http://localhost:3000 | admin/admin (primeiro acesso)|
 
 - **Swagger:** basta acessar a raiz de cada API (ex: http://localhost:8081/)
