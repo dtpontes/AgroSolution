@@ -1,16 +1,34 @@
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'agro-solutions'
 
 scrape_configs:
   - job_name: 'identity-api'
+    metrics_path: '/metrics'
     static_configs:
-      - targets: ['identity-api:9090']
+      - targets: ['identity-api:8081']
+        labels:
+          service: 'identity'
+
   - job_name: 'properties-api'
+    metrics_path: '/metrics'
     static_configs:
-      - targets: ['properties-api:9090']
+      - targets: ['properties-api:8082']
+        labels:
+          service: 'properties'
+
   - job_name: 'sensors-api'
+    metrics_path: '/metrics'
     static_configs:
-      - targets: ['sensors-api:9090']
+      - targets: ['sensors-api:8083']
+        labels:
+          service: 'sensors'
+
   - job_name: 'alerts-api'
+    metrics_path: '/metrics'
     static_configs:
-      - targets: ['alerts-api:9090']
+      - targets: ['alerts-api:8084']
+        labels:
+          service: 'alerts'

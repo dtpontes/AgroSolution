@@ -142,9 +142,11 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseHttpMetrics();
+
 app.MapControllers();
 app.MapHealthChecks("/health");
-app.UseMetricServer(port: 9090);
+app.MapMetrics();
 
 app.Logger.LogInformation("🚀 Identity API iniciada!");
 app.Logger.LogInformation("📍 Swagger disponível em: http://localhost:{0}", app.Configuration["ASPNETCORE_HTTP_PORTS"] ?? "5001");

@@ -140,9 +140,11 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseHttpMetrics();
+
 app.MapControllers();
 app.MapHealthChecks("/health");
-app.UseMetricServer(port: 9090);
+app.MapMetrics();
 
 app.Logger.LogInformation("Properties API iniciada!");
 
